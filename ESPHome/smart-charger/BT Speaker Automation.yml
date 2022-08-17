@@ -1,0 +1,32 @@
+alias: Smart Charge - JBL
+description: JBL Flip 5 Charge
+trigger:
+  - platform: state
+    to: Single
+    entity_id:
+      - select.smart_charger_button3_sensor
+condition: []
+action:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.smart_charge_automation_state_jbl
+    data: {}
+  - type: turn_on
+    device_id: cd6201a28582884b6863d705f942b8aa
+    entity_id: switch.smart_charger_relay_3
+    domain: switch
+  - delay:
+      hours: 2
+      minutes: 30
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: cd6201a28582884b6863d705f942b8aa
+    entity_id: switch.smart_charger_relay_3
+    domain: switch
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.smart_charge_automation_state_jbl
+    data: {}
+mode: single
+max: 10

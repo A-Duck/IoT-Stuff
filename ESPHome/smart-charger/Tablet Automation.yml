@@ -1,0 +1,76 @@
+alias: "Smart Charge - Tablet "
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - select.smart_charger_button2_sensor
+    to: Single
+condition: []
+action:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.smart_charge_automation_state_tablet
+    data: {}
+  - type: turn_on
+    device_id: cd6201a28582884b6863d705f942b8aa
+    entity_id: switch.smart_charger_relay_2
+    domain: switch
+  - wait_for_trigger:
+      - type: plugged_in
+        platform: device
+        device_id: 3bc4f652d6984f6994ec0cc08c596d6f
+        entity_id: binary_sensor.sm_p615_is_charging
+        domain: binary_sensor
+    timeout: "4"
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.sm_p615_is_charging
+            state: "on"
+        sequence:
+          - wait_for_trigger:
+              - platform: state
+                entity_id: sensor.sm_p615_battery_state
+                from: charging
+                to: full
+          - type: turn_off
+            device_id: cd6201a28582884b6863d705f942b8aa
+            entity_id: switch.smart_charger_relay_2
+            domain: switch
+          - service: notify.chris_devices
+            data:
+              message: Tablet has completed charging
+              title: Charge Complete
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.sm_p615_is_charging
+            state: "off"
+        sequence:
+          - type: turn_off
+            device_id: cd6201a28582884b6863d705f942b8aa
+            entity_id: switch.smart_charger_relay_2
+            domain: switch
+          - wait_template: ""
+            timeout: "0.5"
+            continue_on_timeout: true
+          - repeat:
+              count: "3"
+              sequence:
+                - type: turn_on
+                  device_id: cd6201a28582884b6863d705f942b8aa
+                  entity_id: switch.smart_charger_led_2
+                  domain: switch
+                - wait_template: ""
+                  timeout: "0.5"
+                - type: turn_off
+                  device_id: cd6201a28582884b6863d705f942b8aa
+                  entity_id: switch.smart_charger_led_2
+                  domain: switch
+                - wait_template: ""
+                  timeout: "0.5"
+    default: []
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.smart_charge_automation_state_tablet
+    data: {}
+mode: single

@@ -1,0 +1,352 @@
+esphome:
+  name: smart-charger
+
+esp32:
+  board: nodemcu-32s
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: ""
+
+ota:
+  password: ""
+
+web_server:
+  port: 80
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+  domain: .domain
+  manual_ip:
+    static_ip: 0.0.0.0
+    gateway: 0.0.0.0
+    subnet: 255.255.255.0
+
+time:
+  - platform: sntp
+    id: sntp_time
+    servers:
+      - 192.168.33.1
+
+##################
+###   Relays   ###
+##################
+
+switch:
+  - platform: gpio
+    name: Smart Charger - Relay 1
+    icon: mdi:power-socket-eu
+    id: Smart_Charger_Relay1
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 4
+      inverted: true
+    on_turn_on:
+      then:
+        - switch.toggle: Smart_Charger_LED1
+    on_turn_off:
+      then:
+        - switch.toggle: Smart_Charger_LED1
+
+  - platform: gpio
+    name: Smart Charger - Relay 2
+    icon: mdi:power-socket-eu
+    id: Smart_Charger_Relay2
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 16
+      inverted: true
+    on_turn_on:
+      then:
+        - switch.toggle: Smart_Charger_LED2
+    on_turn_off:
+      then:
+        - switch.toggle: Smart_Charger_LED2
+
+  - platform: gpio
+    name: Smart Charger - Relay 3
+    icon: mdi:power-socket-eu
+    id: Smart_Charger_Relay3
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 17
+      inverted: true
+    on_turn_on:
+      then:
+        - switch.toggle: Smart_Charger_LED3
+    on_turn_off:
+      then:
+        - switch.toggle: Smart_Charger_LED3
+
+  - platform: gpio
+    name: Smart Charger - Relay 4
+    icon: mdi:power-socket-eu
+    id: Smart_Charger_Relay4
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 5
+      inverted: true
+    on_turn_on:
+      then:
+        - switch.toggle: Smart_Charger_LED4
+    on_turn_off:
+      then:
+        - switch.toggle: Smart_Charger_LED4
+
+################
+###   LEDS   ###
+################
+
+  - platform: gpio
+    name: Smart Charger - LED 1
+    id: Smart_Charger_LED1
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 18
+      inverted: false
+
+  - platform: gpio
+    name: Smart Charger - LED 2
+    id: Smart_Charger_LED2
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 19
+      inverted: false
+
+  - platform: gpio
+    name: Smart Charger - LED 3
+    id: Smart_Charger_LED3
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 21
+      inverted: false
+    
+  - platform: gpio
+    name: Smart Charger - LED 4
+    id: Smart_Charger_LED4
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: 3
+      inverted: false
+
+###################
+###   Buttons   ###
+###################
+
+binary_sensor:
+  - platform: gpio
+    name: Smart Charger - Button 1
+    icon: mdi:gesture-tap-button
+    internal: true
+    pin:
+      number: 27
+      mode: INPUT_PULLUP
+      inverted: true
+    on_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button1
+            option: Single
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button1
+            option: Idle
+    on_double_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button1
+            option: Double
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button1
+            option: Idle
+    on_multi_click:
+    - timing:
+        - ON for 1.5s to 2.5s
+        - OFF for at least 0.2s
+      then:
+        - switch.turn_on: Smart_Charger_Relay1
+        - delay: 2h
+        - switch.turn_off: Smart_Charger_Relay1
+    - timing:
+        - ON for 4s to 6s
+        - OFF for at least 0.2s
+      then:
+        - switch.toggle: Smart_Charger_Relay1
+
+  - platform: gpio
+    name: Smart Charger - Button 2
+    internal: true
+    icon: mdi:gesture-tap-button
+    pin:
+      number: 26
+      mode: INPUT_PULLUP
+      inverted: true
+    on_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button2
+            option: Single
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button2
+            option: Idle
+    on_double_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button2
+            option: Double
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button2
+            option: Idle
+    on_multi_click:
+    - timing:
+        - ON for 1.5s to 2.5s
+        - OFF for at least 0.2s
+      then:
+        - switch.turn_on: Smart_Charger_Relay2
+        - delay: 2h
+        - switch.turn_off: Smart_Charger_Relay2
+    - timing:
+        - ON for 4s to 6s
+        - OFF for at least 0.2s
+      then:
+        - switch.toggle: Smart_Charger_Relay2
+
+  - platform: gpio
+    name: Smart Charger - Button 3
+    internal: true
+    icon: mdi:gesture-tap-button
+    pin:
+      number: 33
+      mode: INPUT_PULLUP
+      inverted: true
+    on_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button3
+            option: Single
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button3
+            option: Idle
+    on_double_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button3
+            option: Double
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button3
+            option: Idle
+    on_multi_click:
+    - timing:
+        - ON for 1.5s to 2.5s
+        - OFF for at least 0.2s
+      then:
+        - switch.turn_on: Smart_Charger_Relay3
+        - delay: 2h
+        - switch.turn_off: Smart_Charger_Relay3
+    - timing:
+        - ON for 4s to 6s
+        - OFF for at least 0.2s
+      then:
+        - switch.toggle: Smart_Charger_Relay3
+  
+  - platform: gpio
+    name: Smart Charger - Button 4
+    internal: true
+    icon: mdi:gesture-tap-button
+    pin:
+      number: 32
+      mode: INPUT_PULLUP
+      inverted: true
+    on_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button4
+            option: Single
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button4
+            option: Idle
+    on_double_click:
+      then:
+        - select.set:
+            id: Smart_Charger_Template_Button4
+            option: Double
+        - delay: 20ms
+        - select.set:
+            id: Smart_Charger_Template_Button4
+            option: Idle
+    on_multi_click:
+    - timing:
+        - ON for 1.5s to 2.5s
+        - OFF for at least 0.2s
+      then:
+        - switch.turn_on: Smart_Charger_Relay4
+        - delay: 2h
+        - switch.turn_off: Smart_Charger_Relay4
+    - timing:
+        - ON for 4s to 6s
+        - OFF for at least 0.2s
+      then:
+        - switch.toggle: Smart_Charger_Relay4
+
+#####################
+###   Templates   ###
+#####################
+
+select:
+  - platform: template
+    name: "Smart-Charger Button1 Sensor"
+    id: Smart_Charger_Template_Button1
+    optimistic: true
+    options:
+      - Idle
+      - Single
+      - Double
+
+  - platform: template
+    name: "Smart-Charger Button2 Sensor"
+    id: Smart_Charger_Template_Button2
+    optimistic: true
+    options:
+      - Idle
+      - Single
+      - Double
+
+  - platform: template
+    name: "Smart-Charger Button3 Sensor"
+    id: Smart_Charger_Template_Button3
+    optimistic: true
+    options:
+      - Idle
+      - Single
+      - Double
+
+  - platform: template
+    name: "Smart-Charger Button4 Sensor"
+    id: Smart_Charger_Template_Button4
+    optimistic: true
+    options:
+      - Idle
+      - Single
+      - Double
+
+##########################
+###   ESP Management   ###
+##########################
+
+button:
+  - platform: restart
+    name: "Smart Charger - Restart"
